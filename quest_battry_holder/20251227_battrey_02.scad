@@ -11,10 +11,14 @@ slot_w   = 1;   // 切り欠きの幅（Y方向）
 slot_d   = 5;   // 切り欠きの深さ（外周から内側へZ方向）
 slot_off = -2;   // 中央から少しずらしたい場合のオフセット (Y方向)
 
+// バッテリーインジケータの切り欠き
+indicator_w = 20;   // インジケータの幅（Y方向）
+indicator_d = 20;   // インジケータの深さ（外周から内側へZ方向）
+
 // ベルトループ
 loop_extrude = 13;   // 押し出し厚さ（ベルト幅方向 X）
 loop_h       = 39;   // ループ全高（Y方向に倒して使う）
-loop_thick   = 2;    // ループ板厚
+loop_thick   = 2.5;    // ループ板厚
 loop_gap_h   = 35;   // ベルトが通る隙間（X方向の高さ）
 loop_r       = 0.5;    // 角丸半径
 loop_offsetY = -1 + 2*wall;  // 背面からのオフセット
@@ -25,11 +29,16 @@ loop_pos_z   = 10;   // 箱底からの取り付け高さ（ループ下端）
 ////////////////////
 module main_box() {
     difference() {
-        cube([box_w, box_d + 2*wall, box_h], center=false);
-        translate([wall, wall, 0])
-            cube([box_w - wall,
-                  box_d ,
-                  box_h - wall], center=false);
+        difference() {
+            cube([box_w, box_d + 2*wall, box_h], center=false);
+            translate([wall, wall, 0])
+                cube([box_w - wall,
+                    box_d ,
+                    box_h - wall], center=false);
+        }
+        translate([box_w-indicator_w, -wall, 0]) {
+            cube([indicator_w, 3*wall, indicator_d], center=false);  // インジケータの切り欠き    
+        }
     }
 }
 
@@ -44,42 +53,50 @@ module belt_loop_profile() {
 
     outer_w = loop_thick*2 + 3;   // ループ全体の「奥行き」(箱からの出っ張り量)
 
-    inner_bottom = loop_thick;
-    inner_top    = inner_bottom + loop_gap_h;
+    // 下部の円弧半径（外側の幅に合わせる）
+    bottom_r = outer_w / 2;
+    
+    // 内側穴の寸法
+    inner_w = outer_w - loop_thick * 2;  // 内側の幅
+    inner_bottom_r = inner_w / 2;        // 内側下部の円弧半径
+    
+    // 内側穴の位置
+    inner_bottom_y = loop_thick + inner_bottom_r;  // 内側円弧の中心Y
+    inner_top_y = loop_thick + loop_gap_h;         // 内側上端Y
+
+    $fn = 60;  // 円弧の滑らかさ
 
     difference() {
-        //
-        // 1) もとの外形 − 内側の穴
-        //
-        difference() {
-            // 外側輪郭
-            offset(r=loop_r)
-                polygon(points=[
-                    [0, 0],
-                    [outer_w, 0],
-                    [outer_w, loop_h],
-                    [0, loop_h]
-                ]);
-
-            // 内側の穴(ベルト通し部)
-            offset(r=loop_r)
-                polygon(points=[
-                    [loop_thick,           inner_bottom],
-                    [outer_w - loop_thick, inner_bottom],
-                    [outer_w - loop_thick, inner_top],
-                    [loop_thick,           inner_top]
-                ]);
+        // 外側形状：下部半円 + 上部角丸四角
+        union() {
+            // 下部の半円
+            translate([bottom_r, bottom_r])
+                circle(r=bottom_r);
+            
+            // 上部の四角形（角丸）
+            translate([0, bottom_r])
+                offset(r=loop_r)
+                offset(delta=-loop_r)
+                    square([outer_w, loop_h - bottom_r]);
         }
 
-        //
-        // 2) 上側の切り欠き
-        //
+        // 内側の穴（ベルト通し部）：下部半円 + 上部四角
+        union() {
+            // 内側下部の半円
+            translate([outer_w/2, inner_bottom_y])
+                circle(r=inner_bottom_r);
+            
+            // 内側上部の四角形
+            translate([loop_thick, inner_bottom_y])
+                square([inner_w, inner_top_y - inner_bottom_y]);
+        }
+
+        // 上側の切り欠き
         translate([
-            outer_w/2 - slot_w/2 + slot_off,  // Y位置（中央基準）
-            loop_h - slot_d                   // Z位置（上端から slot_d 分下）
+            outer_w/2 - slot_w/2 + slot_off,  // X位置（中央基準）
+            loop_h - slot_d                    // Y位置（上端から slot_d 分下）
         ])
             square([slot_w, slot_d+1], center=false);
-            // slot_d+1 としておくと、外周のエッジをきちんと貫通します
     }
 }
 
