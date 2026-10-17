@@ -8,3 +8,7 @@ OpenSCADにて作成しています。
 
 20251227_battreyscad.scad
 * 試しの作成
+
+20261016_battrey_magnet.scad
+* マグネット（Magsafe対応リング, OD56mm/ID41.5mm/t3mm）埋め込み型
+* 底板に磁石を面一で埋め込み、側面・上蓋の2面と底板の3面でバッテリーの位置決め・着脱を行う
