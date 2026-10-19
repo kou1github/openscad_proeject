@@ -2,7 +2,7 @@
 // Quest3 バッテリーホルダー（マグネット埋め込み版）
 // 元: quest_battry_holder/20251227_battrey_02.scad
 // 変更点:
-//   - リングマグネット（外径56 / 内径41.5 / 厚3mm）の溝を底板(+Y壁)に追加
+//   - リングマグネット（外径57.5 / 内径42 / 厚4mm）の溝を底板(+Y壁)に追加
 //   - 底板(+Y壁)を外側へ増肉して板厚を確保（wall + plate_extra）
 //   - 3面構成: 底板(+Y壁) + 側面(-X壁) + 上蓋(99x21)。前面(-Y)と+X側を開放
 ////////////////////
@@ -36,9 +36,9 @@ loop_pos_z   = 10;
 // 追加パラメータ（マグネット / 増肉）
 ////////////////////
 // リングマグネット実寸
-mag_od = 56.0;  // 外径
-mag_id = 41.5;  // 内径
-mag_t  = 3.0;   // 厚み
+mag_od = 57.5;  // 外径
+mag_id = 42.0;  // 内径
+mag_t  = 4.0;   // 厚み
 
 // 溝の逃げ・深さ
 mag_clr    = 0.25; // 外周の逃げ（片側）。溝径 = mag_od + 2*mag_clr
@@ -46,9 +46,8 @@ mag_clr_id = 0.25; // 中心支柱の逃げ（片側）。支柱径 = mag_id - 2
 mag_depth  = mag_t;       // 溝の深さ＝磁石厚。磁石面を内面と面一にする（隙間0で鉄板に密着）
 
 // 底板(+Y壁)の増肉量。板厚 = wall + plate_extra
-// 5.0mm -> 溝底の残り肉厚 = (wall+plate_extra) - mag_depth = 2.0mm（面一・厚3mm磁石）
-// 4.0mm -> 残り 1.0mm（薄いので非推奨）
-plate_extra = 3.0; // 既定: 板厚 5.0mm
+// 5.5mm -> 溝底の残り肉厚 = (wall+plate_extra) - mag_depth = 1.5mm（面一・厚4mm磁石）
+plate_extra = 3.5; // 既定: 板厚 5.5mm
 
 // 磁石中心（底板の内面、X-Z平面）
 mag_cx = box_w/2;  // 中央
@@ -56,7 +55,7 @@ mag_cz = box_h/2;  // 中央
 
 // 底板(+Y壁)の内面Y / 外面Y
 y_inner = box_d + wall;                 // = 19
-y_outer = box_d + wall + wall + plate_extra; // = 24（板厚 5.0mm 時）
+y_outer = box_d + wall + wall + plate_extra; // = 24.5（板厚 5.5mm 時）
 
 // ベルトループ位置（増肉分だけ外側へ）
 loop_offsetY = -1.5 + 2*wall + plate_extra;
